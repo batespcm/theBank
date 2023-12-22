@@ -15,7 +15,7 @@ public static final String ACCOUNT_CREATED_MESSAGE = "Account successfully creat
         Year currentYear = Year.now();
 
         LocalDate today = LocalDate.now();
-        Month currentMonth = Month.of(today.getMonth().getValue());
+        int currentMonth = today.getMonthValue();
 
         int min = 100000;
         int max = 999999;
