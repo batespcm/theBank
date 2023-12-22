@@ -20,9 +20,10 @@ public class CustomerRequest {
     private String pronouns;
     private String firstLineAddress;
     private String county;
+    private String postcode;
     private String accountNumber;
     private String email;
     private BigDecimal accountBalance;
     private String phoneNumber;
-    private String accountStatus;
+
 }
