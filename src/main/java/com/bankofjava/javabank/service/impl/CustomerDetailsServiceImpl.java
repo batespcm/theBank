@@ -2,7 +2,7 @@ package com.bankofjava.javabank.service.impl;
 
 import com.bankofjava.javabank.dto.CustomerAccountInfo;
 import com.bankofjava.javabank.dto.CustomerRequest;
-import com.bankofjava.javabank.dto.CustomerResponse;
+import com.bankofjava.javabank.dto.BankResponse;
 import com.bankofjava.javabank.entity.Customer;
 import com.bankofjava.javabank.repository.CustomerRepository;
 import com.bankofjava.javabank.utils.AccountUtils;
@@ -16,9 +16,9 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
     CustomerRepository customerRepository;
 
     @Override
-    public CustomerResponse createAccount(CustomerRequest customerRequest) {
+    public BankResponse createAccount(CustomerRequest customerRequest) {
         if (customerRepository.existsByEmail(customerRequest.getEmail())){
-          return CustomerResponse.builder()
+          return BankResponse.builder()
             .responseCode(AccountUtils.ACCOUNT_ALREADY_EXISTS_CODE)
             .responseMessage(AccountUtils.ACCOUNT_ALREADY_EXISTS_MESSAGE)
                   .customerAccountInfo(null)
@@ -42,7 +42,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
                 .build();
 
         Customer savedCustomer = customerRepository.save(newCustomer);
-        return CustomerResponse.builder().responseCode(AccountUtils.ACCOUNT_CREATED_CODE).responseMessage(AccountUtils.ACCOUNT_CREATED_MESSAGE)
+        return BankResponse.builder().responseCode(AccountUtils.ACCOUNT_CREATED_CODE).responseMessage(AccountUtils.ACCOUNT_CREATED_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
                         .accountBalance(savedCustomer.getAccountBalance())
                         .accountNumber(savedCustomer.getAccountNumber())
