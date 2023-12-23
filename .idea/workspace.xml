@@ -5,10 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="abaa822d-ab7d-4103-a495-bfaba20608bd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/controller/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/controller/CustomerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/dto/CustomerResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/dto/BankResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/CustomerDetailsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/CustomerDetailsService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/dto/EmailDetails.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/EmailStructureService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/EmailStructureServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/CustomerDetailsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/CustomerDetailsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +22,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -48,7 +53,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "emailAlerting",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/lee/coding/portfolio/theBank",
+    "last_opened_file_path": "/home/lee/Downloads/Dark-Themes-3.0.5.jar",
     "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
@@ -71,7 +76,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/bankofjava/javabank/service/impl/CustomerDetailsServiceImpl.java</url>
-          <line>19</line>
+          <line>23</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
