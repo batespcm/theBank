@@ -2,7 +2,8 @@ package com.bankofjava.javabank.service.impl;
 
 import com.bankofjava.javabank.dto.CustomerAccountInfo;
 import com.bankofjava.javabank.dto.CustomerRequest;
-import com.bankofjava.javabank.dto.CustomerResponse;
+import com.bankofjava.javabank.dto.BankResponse;
+import com.bankofjava.javabank.dto.EmailDetails;
 import com.bankofjava.javabank.entity.Customer;
 import com.bankofjava.javabank.repository.CustomerRepository;
 import com.bankofjava.javabank.utils.AccountUtils;
@@ -15,10 +16,13 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
+    EmailStructureService emailStructureService;
+
     @Override
-    public CustomerResponse createAccount(CustomerRequest customerRequest) {
+    public BankResponse createAccount(CustomerRequest customerRequest) {
         if (customerRepository.existsByEmail(customerRequest.getEmail())){
-          return CustomerResponse.builder()
+          return BankResponse.builder()
             .responseCode(AccountUtils.ACCOUNT_ALREADY_EXISTS_CODE)
             .responseMessage(AccountUtils.ACCOUNT_ALREADY_EXISTS_MESSAGE)
                   .customerAccountInfo(null)
@@ -42,7 +46,15 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
                 .build();
 
         Customer savedCustomer = customerRepository.save(newCustomer);
-        return CustomerResponse.builder().responseCode(AccountUtils.ACCOUNT_CREATED_CODE).responseMessage(AccountUtils.ACCOUNT_CREATED_MESSAGE)
+        // send email to new customer
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(savedCustomer.getEmail())
+                .subject("New Account Created")
+                .messageBody("Congratulations on opening a new account with theBank.\nYour Account Details: \n" +
+                        "Account Name: " + savedCustomer.getFirstName() + " " + savedCustomer.getLastName() + "\nAccount Number: " + savedCustomer.getAccountNumber())
+                .build();
+        emailStructureService.sendEmailAlert(emailDetails);
+        return BankResponse.builder().responseCode(AccountUtils.ACCOUNT_CREATED_CODE).responseMessage(AccountUtils.ACCOUNT_CREATED_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
                         .accountBalance(savedCustomer.getAccountBalance())
                         .accountNumber(savedCustomer.getAccountNumber())
