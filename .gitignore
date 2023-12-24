@@ -443,3 +443,4 @@ src/env.properties
 .project
 .settings/
 target/
+env.properties
