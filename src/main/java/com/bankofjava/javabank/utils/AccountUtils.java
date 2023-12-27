@@ -1,7 +1,6 @@
 package com.bankofjava.javabank.utils;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.Year;
 
 public class AccountUtils {
@@ -11,6 +10,10 @@ public static final String ACCOUNT_ALREADY_EXISTS_CODE = "0001";
 public static final String ACCOUNT_ALREADY_EXISTS_MESSAGE = "This user already has an account on the system";
 public static final String ACCOUNT_CREATED_CODE = "0002";
 public static final String ACCOUNT_CREATED_MESSAGE = "Account successfully created";
+public static final String ACCOUNT_DOES_NOT_EXIST_CODE = "0003";
+public static final String ACCOUNT_DOES_NOT_EXIST_MESSAGE = "Account does not exist";
+    public static final String ACCOUNT_FOUND_CODE = "0004";
+    public static final String ACCOUNT_FOUND_MESSAGE = "Account Found Successfully";
     public static String createAccountNumber(){
         Year currentYear = Year.now();
 

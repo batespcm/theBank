@@ -1,9 +1,6 @@
 package com.bankofjava.javabank.service.impl;
 
-import com.bankofjava.javabank.dto.CustomerAccountInfo;
-import com.bankofjava.javabank.dto.CustomerRequest;
-import com.bankofjava.javabank.dto.BankResponse;
-import com.bankofjava.javabank.dto.EmailDetails;
+import com.bankofjava.javabank.dto.*;
 import com.bankofjava.javabank.entity.Customer;
 import com.bankofjava.javabank.repository.CustomerRepository;
 import com.bankofjava.javabank.utils.AccountUtils;
@@ -61,5 +58,37 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
                         .accountName(savedCustomer.getFirstName() + " " + savedCustomer.getLastName() + " " + savedCustomer.getOtherName())
                         .build())
                 .build();
+    }
+
+    @Override
+    public BankResponse balanceEnquiry(AccountEnquiryRequest balanceRequest) {
+        boolean accountExists = customerRepository.existsByAccountNumber(balanceRequest.getAccountNumber());
+        if (!accountExists){
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        }
+
+        Customer requestedCustomer = customerRepository.findByAccountNumber(balanceRequest.getAccountNumber());
+        return BankResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
+                .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
+                .customerAccountInfo(CustomerAccountInfo.builder()
+                        .accountBalance(requestedCustomer.getAccountBalance())
+                        .accountNumber(balanceRequest.getAccountNumber())
+                        .accountName(requestedCustomer.getFirstName() + " " + requestedCustomer.getLastName())
+                        .build())
+                .build();
+    }
+    @Override
+    public String nameEnquiry(AccountEnquiryRequest nameRequest) {
+        boolean accountExists = customerRepository.existsByAccountNumber(nameRequest.getAccountNumber());
+        if (!accountExists){
+        return AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE;
+        }
+        Customer requestedCustomer = customerRepository.findByAccountNumber(nameRequest.getAccountNumber());
+        return requestedCustomer.getFirstName()  + " " + requestedCustomer.getLastName();
     }
 }
