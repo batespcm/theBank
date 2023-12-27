@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+
 @Service
-public class CustomerDetailsServiceImpl implements CustomerDetailsService{
+public class CustomerDetailsServiceImpl implements CustomerDetailsService {
     @Autowired
     CustomerRepository customerRepository;
 
@@ -18,13 +19,14 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
 
     @Override
     public BankResponse createAccount(CustomerRequest customerRequest) {
-        if (customerRepository.existsByEmail(customerRequest.getEmail())){
-          return BankResponse.builder()
-            .responseCode(AccountUtils.ACCOUNT_ALREADY_EXISTS_CODE)
-            .responseMessage(AccountUtils.ACCOUNT_ALREADY_EXISTS_MESSAGE)
-                  .customerAccountInfo(null)
-            .build();
+        if (customerRepository.existsByEmail(customerRequest.getEmail())) {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_ALREADY_EXISTS_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_ALREADY_EXISTS_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
         }
+        
         Customer newCustomer = Customer.builder()
                 .prefix(customerRequest.getPrefix())
                 .firstName(customerRequest.getFirstName())
@@ -43,7 +45,6 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
                 .build();
 
         Customer savedCustomer = customerRepository.save(newCustomer);
-        // send email to new customer
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient(savedCustomer.getEmail())
                 .subject("New Account Created")
@@ -60,10 +61,11 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
                 .build();
     }
 
+
     @Override
     public BankResponse balanceEnquiry(AccountEnquiryRequest balanceRequest) {
         boolean accountExists = customerRepository.existsByAccountNumber(balanceRequest.getAccountNumber());
-        if (!accountExists){
+        if (!accountExists) {
             return BankResponse.builder()
                     .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
                     .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
@@ -82,13 +84,41 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService{
                         .build())
                 .build();
     }
+
     @Override
     public String nameEnquiry(AccountEnquiryRequest nameRequest) {
         boolean accountExists = customerRepository.existsByAccountNumber(nameRequest.getAccountNumber());
-        if (!accountExists){
-        return AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE;
+        if (!accountExists) {
+            return AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE;
         }
         Customer requestedCustomer = customerRepository.findByAccountNumber(nameRequest.getAccountNumber());
-        return requestedCustomer.getFirstName()  + " " + requestedCustomer.getLastName();
+        return requestedCustomer.getFirstName() + " " + requestedCustomer.getLastName();
+    }
+
+
+    @Override
+    public BankResponse creditAccountTransaction(CreditDebitRequest creditRequest) {
+        boolean accountExists = customerRepository.existsByAccountNumber(creditRequest.getAccountNumber());
+        if (!accountExists) {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        }
+
+
+        Customer accountToCredit = customerRepository.findByAccountNumber(creditRequest.getAccountNumber());
+        accountToCredit.setAccountBalance(accountToCredit.getAccountBalance().add(creditRequest.getAmount()));
+        customerRepository.save(accountToCredit);
+        return BankResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_CREDITED_CODE)
+                .responseMessage(AccountUtils.ACCOUNT_CREDITED_MESSAGE)
+                .customerAccountInfo(CustomerAccountInfo.builder()
+                        .accountName(accountToCredit.getFirstName() + " " + accountToCredit.getLastName())
+                        .accountBalance(accountToCredit.getAccountBalance())
+                        .accountNumber(creditRequest.getAccountNumber())
+                        .build())
+                .build();
     }
 }
