@@ -34,4 +34,9 @@ public class CustomerController {
         return customerDetailsService.creditAccountTransaction(creditRequest);
     }
 
+    @PostMapping("/debitAccount")
+    public BankResponse debitAccount(@RequestBody CreditDebitRequest debitRequest) {
+        return customerDetailsService.debitAccountTransaction(debitRequest);
+    }
+
 }

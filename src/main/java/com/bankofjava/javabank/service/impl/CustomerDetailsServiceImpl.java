@@ -26,7 +26,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                     .customerAccountInfo(null)
                     .build();
         }
-        
+
         Customer newCustomer = Customer.builder()
                 .prefix(customerRequest.getPrefix())
                 .firstName(customerRequest.getFirstName())
@@ -118,6 +118,31 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                         .accountName(accountToCredit.getFirstName() + " " + accountToCredit.getLastName())
                         .accountBalance(accountToCredit.getAccountBalance())
                         .accountNumber(creditRequest.getAccountNumber())
+                        .build())
+                .build();
+    }
+
+    @Override
+    public BankResponse debitAccountTransaction(CreditDebitRequest debitRequest) {
+        boolean accountExists = customerRepository.existsByAccountNumber(debitRequest.getAccountNumber());
+        if (!accountExists) {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        }
+
+        Customer accountToDebit = customerRepository.findByAccountNumber(debitRequest.getAccountNumber());
+        accountToDebit.setAccountBalance(accountToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
+        customerRepository.save(accountToDebit);
+        return BankResponse.builder()
+                .responseCode(AccountUtils.ACCOUNT_DEBITED_CODE)
+                .responseMessage(AccountUtils.ACCOUNT_DEBITED_MESSAGE)
+                .customerAccountInfo(CustomerAccountInfo.builder()
+                        .accountName(accountToDebit.getFirstName() + " " + accountToDebit.getLastName())
+                        .accountBalance(accountToDebit.getAccountBalance())
+                        .accountNumber(debitRequest.getAccountNumber())
                         .build())
                 .build();
     }
