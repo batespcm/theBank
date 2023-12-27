@@ -134,16 +134,28 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         }
 
         Customer accountToDebit = customerRepository.findByAccountNumber(debitRequest.getAccountNumber());
-        accountToDebit.setAccountBalance(accountToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
-        customerRepository.save(accountToDebit);
-        return BankResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_DEBITED_CODE)
-                .responseMessage(AccountUtils.ACCOUNT_DEBITED_MESSAGE)
-                .customerAccountInfo(CustomerAccountInfo.builder()
-                        .accountName(accountToDebit.getFirstName() + " " + accountToDebit.getLastName())
-                        .accountBalance(accountToDebit.getAccountBalance())
-                        .accountNumber(debitRequest.getAccountNumber())
-                        .build())
-                .build();
+        BigDecimal availableBalance = accountToDebit.getAccountBalance();
+        BigDecimal debitAmount = debitRequest.getAmount();
+        // accountToDebit.setAccountBalance(accountToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
+        int result = availableBalance.compareTo(debitAmount);
+        if (result < 0) {
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_HAS_INSUFFICIENT_FUNDS_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_HAS_INSUFFICIENT_FUNDS_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        } else {
+            accountToDebit.setAccountBalance(accountToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
+            customerRepository.save(accountToDebit);
+            return BankResponse.builder()
+                    .responseCode(AccountUtils.ACCOUNT_DEBITED_CODE)
+                    .responseMessage(AccountUtils.ACCOUNT_DEBITED_MESSAGE)
+                    .customerAccountInfo(CustomerAccountInfo.builder()
+                            .accountName(accountToDebit.getFirstName() + " " + accountToDebit.getLastName())
+                            .accountBalance(accountToDebit.getAccountBalance())
+                            .accountNumber(debitRequest.getAccountNumber())
+                            .build())
+                    .build();
+        }
     }
 }

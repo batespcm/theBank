@@ -18,6 +18,8 @@ public class AccountUtils {
     public static final String ACCOUNT_CREDITED_MESSAGE = "Account Credited Successfully";
     public static final String ACCOUNT_DEBITED_CODE = "0006";
     public static final String ACCOUNT_DEBITED_MESSAGE = "Account Debited Successfully";
+    public static final String ACCOUNT_HAS_INSUFFICIENT_FUNDS_CODE = "0007";
+    public static final String ACCOUNT_HAS_INSUFFICIENT_FUNDS_MESSAGE = "Account Has Insufficient Funds";
 
     public static String createAccountNumber() {
         Year currentYear = Year.now();
