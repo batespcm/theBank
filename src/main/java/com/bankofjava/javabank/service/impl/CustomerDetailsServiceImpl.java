@@ -4,6 +4,8 @@ import com.bankofjava.javabank.dto.*;
 import com.bankofjava.javabank.entity.Customer;
 import com.bankofjava.javabank.repository.CustomerRepository;
 import com.bankofjava.javabank.utils.AccountUtils;
+import com.bankofjava.javabank.utils.ResponseCodes;
+import com.bankofjava.javabank.utils.ResponseMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +23,8 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
     public BankResponse createAccount(CustomerRequest customerRequest) {
         if (customerRepository.existsByEmail(customerRequest.getEmail())) {
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_ALREADY_EXISTS_CODE)
-                    .responseMessage(AccountUtils.ACCOUNT_ALREADY_EXISTS_MESSAGE)
+                    .responseCode(ResponseCodes.ACCOUNT_ALREADY_EXISTS_CODE)
+                    .responseMessage(ResponseMessages.ACCOUNT_ALREADY_EXISTS_MESSAGE)
                     .customerAccountInfo(null)
                     .build();
         }
@@ -52,7 +54,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                         "Account Name: " + savedCustomer.getFirstName() + " " + savedCustomer.getLastName() + "\nAccount Number: " + savedCustomer.getAccountNumber())
                 .build();
         emailStructureService.sendEmailAlert(emailDetails);
-        return BankResponse.builder().responseCode(AccountUtils.ACCOUNT_CREATED_CODE).responseMessage(AccountUtils.ACCOUNT_CREATED_MESSAGE)
+        return BankResponse.builder().responseCode(ResponseCodes.ACCOUNT_CREATED_CODE).responseMessage(ResponseMessages.ACCOUNT_CREATED_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
                         .accountBalance(savedCustomer.getAccountBalance())
                         .accountNumber(savedCustomer.getAccountNumber())
@@ -67,16 +69,16 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         boolean accountExists = customerRepository.existsByAccountNumber(balanceRequest.getAccountNumber());
         if (!accountExists) {
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
-                    .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .responseCode(ResponseCodes.ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(ResponseMessages.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
                     .customerAccountInfo(null)
                     .build();
         }
 
         Customer requestedCustomer = customerRepository.findByAccountNumber(balanceRequest.getAccountNumber());
         return BankResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_FOUND_CODE)
-                .responseMessage(AccountUtils.ACCOUNT_FOUND_MESSAGE)
+                .responseCode(ResponseCodes.ACCOUNT_FOUND_CODE)
+                .responseMessage(ResponseMessages.ACCOUNT_FOUND_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
                         .accountBalance(requestedCustomer.getAccountBalance())
                         .accountNumber(balanceRequest.getAccountNumber())
@@ -89,7 +91,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
     public String nameEnquiry(AccountEnquiryRequest nameRequest) {
         boolean accountExists = customerRepository.existsByAccountNumber(nameRequest.getAccountNumber());
         if (!accountExists) {
-            return AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE;
+            return ResponseMessages.ACCOUNT_DOES_NOT_EXIST_MESSAGE;
         }
         Customer requestedCustomer = customerRepository.findByAccountNumber(nameRequest.getAccountNumber());
         return requestedCustomer.getFirstName() + " " + requestedCustomer.getLastName();
@@ -101,8 +103,8 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         boolean accountExists = customerRepository.existsByAccountNumber(creditRequest.getAccountNumber());
         if (!accountExists) {
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
-                    .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .responseCode(ResponseCodes.ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(ResponseMessages.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
                     .customerAccountInfo(null)
                     .build();
         }
@@ -112,8 +114,8 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         accountToCredit.setAccountBalance(accountToCredit.getAccountBalance().add(creditRequest.getAmount()));
         customerRepository.save(accountToCredit);
         return BankResponse.builder()
-                .responseCode(AccountUtils.ACCOUNT_CREDITED_CODE)
-                .responseMessage(AccountUtils.ACCOUNT_CREDITED_MESSAGE)
+                .responseCode(ResponseCodes.ACCOUNT_CREDITED_CODE)
+                .responseMessage(ResponseMessages.ACCOUNT_CREDITED_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
                         .accountName(accountToCredit.getFirstName() + " " + accountToCredit.getLastName())
                         .accountBalance(accountToCredit.getAccountBalance())
@@ -127,8 +129,8 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         boolean accountExists = customerRepository.existsByAccountNumber(debitRequest.getAccountNumber());
         if (!accountExists) {
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_DOES_NOT_EXIST_CODE)
-                    .responseMessage(AccountUtils.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .responseCode(ResponseCodes.ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(ResponseMessages.ACCOUNT_DOES_NOT_EXIST_MESSAGE)
                     .customerAccountInfo(null)
                     .build();
         }
@@ -140,16 +142,16 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         int result = availableBalance.compareTo(debitAmount);
         if (result < 0) {
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_HAS_INSUFFICIENT_FUNDS_CODE)
-                    .responseMessage(AccountUtils.ACCOUNT_HAS_INSUFFICIENT_FUNDS_MESSAGE)
+                    .responseCode(ResponseCodes.ACCOUNT_HAS_INSUFFICIENT_FUNDS_CODE)
+                    .responseMessage(ResponseMessages.ACCOUNT_HAS_INSUFFICIENT_FUNDS_MESSAGE)
                     .customerAccountInfo(null)
                     .build();
         } else {
             accountToDebit.setAccountBalance(accountToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
             customerRepository.save(accountToDebit);
             return BankResponse.builder()
-                    .responseCode(AccountUtils.ACCOUNT_DEBITED_CODE)
-                    .responseMessage(AccountUtils.ACCOUNT_DEBITED_MESSAGE)
+                    .responseCode(ResponseCodes.ACCOUNT_DEBITED_CODE)
+                    .responseMessage(ResponseMessages.ACCOUNT_DEBITED_MESSAGE)
                     .customerAccountInfo(CustomerAccountInfo.builder()
                             .accountName(accountToDebit.getFirstName() + " " + accountToDebit.getLastName())
                             .accountBalance(accountToDebit.getAccountBalance())
