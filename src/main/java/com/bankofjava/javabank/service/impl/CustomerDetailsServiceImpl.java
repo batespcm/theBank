@@ -27,7 +27,10 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                     .customerAccountInfo(null)
                     .build();
         }
-
+        String newAccountNumber = AccountUtils.createAccountNumber();
+        if (customerRepository.existsByAccountNumber(newAccountNumber)) {
+            newAccountNumber = AccountUtils.createAccountNumber();
+        }
         Customer newCustomer = Customer.builder()
                 .prefix(customerRequest.getPrefix())
                 .firstName(customerRequest.getFirstName())
@@ -38,7 +41,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                 .firstLineAddress(customerRequest.getFirstLineAddress())
                 .county(customerRequest.getCounty())
                 .postcode(customerRequest.getPostcode())
-                .accountNumber(AccountUtils.createAccountNumber())
+                .accountNumber(newAccountNumber)
                 .email(customerRequest.getEmail())
                 .accountBalance(BigDecimal.ZERO)
                 .phoneNumber(customerRequest.getPhoneNumber())
