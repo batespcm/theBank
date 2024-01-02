@@ -2,7 +2,7 @@
 
 A Basic demo backend using Java for Banking
 
-An env.properties file is needed in your route directory and your chosen db name etc will need populating.
+An env.properties file is needed in your root directory and your chosen db name etc will need populating.
 
 A sample env.properties file can be found in **src/main/resources/templates/env.template** and should be copied to the
 root directory and renamed to env.properties.
