@@ -1,9 +1,6 @@
 package com.bankofjava.javabank.controller;
 
-import com.bankofjava.javabank.dto.AccountEnquiryRequest;
-import com.bankofjava.javabank.dto.BankResponse;
-import com.bankofjava.javabank.dto.CreditDebitRequest;
-import com.bankofjava.javabank.dto.CustomerRequest;
+import com.bankofjava.javabank.dto.*;
 import com.bankofjava.javabank.service.impl.CustomerDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,4 +36,8 @@ public class CustomerController {
         return customerDetailsService.debitAccountTransaction(debitRequest);
     }
 
+    @PostMapping("/transfer")
+    public BankResponse accountTransfer(@RequestBody AccountTransferRequest transferRequest) {
+        return customerDetailsService.accountTransferTransaction(transferRequest);
+    }
 }
