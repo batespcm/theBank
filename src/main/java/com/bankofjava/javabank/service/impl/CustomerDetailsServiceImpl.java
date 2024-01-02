@@ -49,11 +49,12 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                 .build();
 
         Customer savedCustomer = customerRepository.save(newCustomer);
+        String savedCustomerFullName = AccountUtils.getFullName(savedCustomer);
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient(savedCustomer.getEmail())
                 .subject("New Account Created")
                 .messageBody("Congratulations on opening a new account with theBank.\nYour Account Details: \n" +
-                        "Account Name: " + savedCustomer.getFirstName() + " " + savedCustomer.getLastName() + "\nAccount Number: " + savedCustomer.getAccountNumber())
+                        "Account Name: " + savedCustomerFullName + "\nAccount Number: " + savedCustomer.getAccountNumber())
                 .build();
         emailStructureService.sendEmailAlert(emailDetails);
         return BankResponse.builder()
@@ -80,13 +81,14 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         }
 
         Customer requestedCustomer = customerRepository.findByAccountNumber(balanceRequest.getAccountNumber());
+        String requestedCustomerFullName = AccountUtils.getFullName(requestedCustomer);
         return BankResponse.builder()
                 .responseCode(ApiResponses.ACCOUNT_FOUND_CODE)
                 .responseMessage(ApiResponses.ACCOUNT_FOUND_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
                         .accountBalance(requestedCustomer.getAccountBalance())
                         .accountNumber(balanceRequest.getAccountNumber())
-                        .accountName(requestedCustomer.getFirstName() + " " + requestedCustomer.getLastName())
+                        .accountName(requestedCustomerFullName)
                         .build())
                 .build();
     }
@@ -98,7 +100,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
             return ApiResponses.ACCOUNT_DOES_NOT_EXIST_MESSAGE;
         }
         Customer requestedCustomer = customerRepository.findByAccountNumber(nameRequest.getAccountNumber());
-        return requestedCustomer.getFirstName() + " " + requestedCustomer.getLastName();
+        return AccountUtils.getFullName(requestedCustomer);
     }
 
 
@@ -121,7 +123,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                 .responseCode(ApiResponses.ACCOUNT_CREDITED_CODE)
                 .responseMessage(ApiResponses.ACCOUNT_CREDITED_MESSAGE)
                 .customerAccountInfo(CustomerAccountInfo.builder()
-                        .accountName(accountToCredit.getFirstName() + " " + accountToCredit.getLastName())
+                        .accountName(AccountUtils.getFullName(accountToCredit))
                         .accountBalance(accountToCredit.getAccountBalance())
                         .accountNumber(creditRequest.getAccountNumber())
                         .build())
@@ -156,7 +158,7 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                     .responseCode(ApiResponses.ACCOUNT_DEBITED_CODE)
                     .responseMessage(ApiResponses.ACCOUNT_DEBITED_MESSAGE)
                     .customerAccountInfo(CustomerAccountInfo.builder()
-                            .accountName(accountToDebit.getFirstName() + " " + accountToDebit.getLastName())
+                            .accountName(AccountUtils.getFullName(accountToDebit))
                             .accountBalance(accountToDebit.getAccountBalance())
                             .accountNumber(debitRequest.getAccountNumber())
                             .build())
@@ -182,11 +184,17 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                     .customerAccountInfo(null)
                     .build();
         }
+
         Customer payeeAccount = customerRepository.findByAccountNumber(transferRequest.getPayeeAccountNumber());
+        String payeeFullName = AccountUtils.getFullName(payeeAccount);
         Customer recipientAccount = customerRepository.findByAccountNumber(transferRequest.getRecipientAccountNumber());
+        String recipientFullName = AccountUtils.getFullName(recipientAccount);
         BigDecimal availableBalance = payeeAccount.getAccountBalance();
+
         BigDecimal debitAmount = transferRequest.getAmount();
+
         int result = availableBalance.compareTo(debitAmount);
+
         if (result < 0) {
             return BankResponse.builder()
                     .responseCode(ApiResponses.PAYEE_ACCOUNT_HAS_INSUFFICIENT_FUNDS_CODE)
@@ -194,20 +202,25 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                     .customerAccountInfo(null)
                     .build();
         }
+
         payeeAccount.setAccountBalance(payeeAccount.getAccountBalance().subtract(transferRequest.getAmount()));
         customerRepository.save(payeeAccount);
+
         EmailDetails debitNotificationEmail = EmailDetails.builder()
                 .subject("Account Debit Notification").recipient(payeeAccount.getEmail())
-                .messageBody("Your account has been debited: " + transferRequest.getAmount() + " has been deducted from your account. Your remaining balance is: " + payeeAccount.getAccountBalance())
+                .messageBody("Dear " + payeeFullName + "\nYour account has been debited: " + transferRequest.getAmount() + " has been deducted from your account.\nYour remaining balance is: " + payeeAccount.getAccountBalance())
                 .build();
         emailStructureService.sendEmailAlert(debitNotificationEmail);
+
         recipientAccount.setAccountBalance(recipientAccount.getAccountBalance().add(transferRequest.getAmount()));
         customerRepository.save(recipientAccount);
+
         EmailDetails creditNotificationEmail = EmailDetails.builder()
                 .subject("Account Credit Notification").recipient(recipientAccount.getEmail())
-                .messageBody("Your account has been credited: " + transferRequest.getAmount() + " has been deducted from your account. Your current balance is: " + recipientAccount.getAccountBalance())
+                .messageBody("Dear " + recipientFullName + "\nYour account has been credited: " + transferRequest.getAmount() + " has been deposited to your account.\nYour current balance is: " + recipientAccount.getAccountBalance())
                 .build();
         emailStructureService.sendEmailAlert(creditNotificationEmail);
+
         return BankResponse.builder()
                 .responseCode(ApiResponses.FINANCIAL_TRANSFER_SUCCESS_CODE)
                 .responseMessage(ApiResponses.FINANCIAL_TRANSFER_SUCCESS_MESSAGE)
