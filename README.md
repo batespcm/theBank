@@ -27,3 +27,7 @@ Gmail can be used and credentials and passwords and port number added:
 3. Open Postman once the app is running successfully and copy the template to the raw setting and go to the relevant
    endpoint (**http://localhost:8080/api/customer**) with a post request and create your first account.
 4. Change come details and create a second account to allow use of the other endpoints for account transfers etc.
+
+**Swagger**
+Swagger added to the api and can be accessed when the app is running by going to
+**http://localhost:8080/swagger-ui/index.html#/**
