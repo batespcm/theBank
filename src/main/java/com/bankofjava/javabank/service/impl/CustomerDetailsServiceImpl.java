@@ -142,7 +142,6 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
         Customer accountToDebit = customerRepository.findByAccountNumber(debitRequest.getAccountNumber());
         BigDecimal availableBalance = accountToDebit.getAccountBalance();
         BigDecimal debitAmount = debitRequest.getAmount();
-        // accountToDebit.setAccountBalance(accountToDebit.getAccountBalance().subtract(debitRequest.getAmount()));
         int result = availableBalance.compareTo(debitAmount);
         if (result < 0) {
             return BankResponse.builder()
@@ -163,5 +162,56 @@ public class CustomerDetailsServiceImpl implements CustomerDetailsService {
                             .build())
                     .build();
         }
+    }
+
+    @Override
+    public BankResponse accountTransferTransaction(AccountTransferRequest transferRequest) {
+        boolean payeeAccountExists = customerRepository.existsByAccountNumber(transferRequest.getPayeeAccountNumber());
+        boolean recipientAccountExists = customerRepository.existsByAccountNumber(transferRequest.getRecipientAccountNumber());
+        if (!payeeAccountExists) {
+            return BankResponse.builder()
+                    .responseCode(ApiResponses.PAYEE_ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(ApiResponses.PAYEE_ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        }
+        if (!recipientAccountExists) {
+            return BankResponse.builder()
+                    .responseCode(ApiResponses.RECIPIENT_ACCOUNT_DOES_NOT_EXIST_CODE)
+                    .responseMessage(ApiResponses.RECIPIENT_ACCOUNT_DOES_NOT_EXIST_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        }
+        Customer payeeAccount = customerRepository.findByAccountNumber(transferRequest.getPayeeAccountNumber());
+        Customer recipientAccount = customerRepository.findByAccountNumber(transferRequest.getRecipientAccountNumber());
+        BigDecimal availableBalance = payeeAccount.getAccountBalance();
+        BigDecimal debitAmount = transferRequest.getAmount();
+        int result = availableBalance.compareTo(debitAmount);
+        if (result < 0) {
+            return BankResponse.builder()
+                    .responseCode(ApiResponses.PAYEE_ACCOUNT_HAS_INSUFFICIENT_FUNDS_CODE)
+                    .responseMessage(ApiResponses.PAYEE_ACCOUNT_HAS_INSUFFICIENT_FUNDS_MESSAGE)
+                    .customerAccountInfo(null)
+                    .build();
+        }
+        payeeAccount.setAccountBalance(payeeAccount.getAccountBalance().subtract(transferRequest.getAmount()));
+        customerRepository.save(payeeAccount);
+        EmailDetails debitNotificationEmail = EmailDetails.builder()
+                .subject("Account Debit Notification").recipient(payeeAccount.getEmail())
+                .messageBody("Your account has been debited: " + transferRequest.getAmount() + " has been deducted from your account. Your remaining balance is: " + payeeAccount.getAccountBalance())
+                .build();
+        emailStructureService.sendEmailAlert(debitNotificationEmail);
+        recipientAccount.setAccountBalance(recipientAccount.getAccountBalance().add(transferRequest.getAmount()));
+        customerRepository.save(recipientAccount);
+        EmailDetails creditNotificationEmail = EmailDetails.builder()
+                .subject("Account Credit Notification").recipient(recipientAccount.getEmail())
+                .messageBody("Your account has been credited: " + transferRequest.getAmount() + " has been deducted from your account. Your current balance is: " + recipientAccount.getAccountBalance())
+                .build();
+        emailStructureService.sendEmailAlert(creditNotificationEmail);
+        return BankResponse.builder()
+                .responseCode(ApiResponses.FINANCIAL_TRANSFER_SUCCESS_CODE)
+                .responseMessage(ApiResponses.FINANCIAL_TRANSFER_SUCCESS_MESSAGE)
+                .customerAccountInfo(null)
+                .build();
     }
 }

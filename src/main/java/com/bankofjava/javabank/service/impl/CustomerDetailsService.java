@@ -1,9 +1,6 @@
 package com.bankofjava.javabank.service.impl;
 
-import com.bankofjava.javabank.dto.AccountEnquiryRequest;
-import com.bankofjava.javabank.dto.BankResponse;
-import com.bankofjava.javabank.dto.CreditDebitRequest;
-import com.bankofjava.javabank.dto.CustomerRequest;
+import com.bankofjava.javabank.dto.*;
 
 public interface CustomerDetailsService {
 
@@ -16,4 +13,7 @@ public interface CustomerDetailsService {
     BankResponse creditAccountTransaction(CreditDebitRequest creditRequest);
 
     BankResponse debitAccountTransaction(CreditDebitRequest debitRequest);
+
+    BankResponse accountTransferTransaction(AccountTransferRequest transferRequest);
 }
+
