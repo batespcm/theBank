@@ -1,9 +1,13 @@
 package com.bankofjava.javabank.utils;
 
+import com.bankofjava.javabank.entity.Customer;
+import com.bankofjava.javabank.repository.CustomerRepository;
+
 import java.time.LocalDate;
 import java.time.Year;
 
 public class AccountUtils {
+    CustomerRepository customerRepository;
 
     public static String createAccountNumber() {
         Year currentYear = Year.now();
@@ -22,4 +26,10 @@ public class AccountUtils {
         return year + month + randNumber;
     }
 
+    public static String getFullName(Customer customer) {
+        String prefix = customer.getPrefix();
+        String firstName = customer.getFirstName();
+        String lastName = customer.getLastName();
+        return prefix + " " + firstName + " " + lastName;
+    }
 }
